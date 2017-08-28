@@ -1,0 +1,34 @@
+{
+  "contract_name": "tinyShop",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "payable": false,
+      "type": "constructor"
+    }
+  ],
+  "unlinked_binary": "0x60606040523415600b57fe5b5b5b60008054600160a060020a03191633600160a060020a03161790555b5b5b6084806100396000396000f300606060405263ffffffff60e060020a6000350416638da5cb5b81146020575bfe5b3415602757fe5b602d6049565b60408051600160a060020a039092168252519081900360200190f35b600054600160a060020a0316815600a165627a7a72305820cd9d49b896771ec42b56e9ef6a57d0a91527c4c750e189ab245dabf569bed6390029",
+  "networks": {
+    "1503934515873": {
+      "events": {},
+      "links": {},
+      "address": "0xa849b641f13ee814ca6c08cf581d144b648bb53f",
+      "updated_at": 1503935267870
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1503935267870
+}
