@@ -2,27 +2,45 @@ pragma solidity ^0.4.6;
 
 contract User {
   struct UserStruct {
-    /*uint userIndex;
-    uint ownerIndex;*/
     uint adminIndex;
   }
 
-  mapping(address => UserStruct) internal userStructs;
-  /*address[] internal userIndex;
-  address[] internal ownerIndex;*/
-  address[] internal adminsIndex;
+  mapping(address => UserStruct) public userStructs;
+  address[] public adminsIndex;
 
-  function User() {
+  function insertAdmin(address newAddress)
+    public
+    returns(uint newIndex)
+  {
+    userStructs[newAddress].adminIndex = adminsIndex.push(newAddress) - 1;
 
+    return (adminsIndex.length - 1);
   }
 
   function isAdmin( address adminAddress)
     public
-    returns(bool isAdmin)
+    constant
+    returns(bool isIndeed)
   {
     if(adminsIndex.length == 0) return false;
 
     return (adminsIndex[userStructs[adminAddress].adminIndex] == adminAddress);
+  }
+
+  function getAdminCount()
+    public
+    constant
+    returns(uint count)
+  {
+    return adminsIndex.length;
+  }
+
+  function getAdminAtIndex(uint index)
+    public
+    constant
+    returns(address adminAddress)
+  {
+    return adminsIndex[index];
   }
 
 }

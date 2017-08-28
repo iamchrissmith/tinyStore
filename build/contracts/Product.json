@@ -1,0 +1,8 @@
+{
+  "contract_name": "Product",
+  "abi": [],
+  "unlinked_binary": "0x60606040523415600b57fe5b5b60338060196000396000f30060606040525bfe00a165627a7a72305820de35663840605a8f9abf576d1830f2d52f0364334bc56c708135f1777e9eb3310029",
+  "networks": {},
+  "schema_version": "0.0.5",
+  "updated_at": 1503937723582
+}

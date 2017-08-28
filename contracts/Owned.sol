@@ -6,4 +6,13 @@ contract Owned {
   function Owned() {
     owner = msg.sender;
   }
+
+  /*function destroy() 
+    public
+    returns(bool success)
+  {
+    require(msg.sender == owner);
+    selfdestruct(owner);
+    return true;
+  }*/
 }

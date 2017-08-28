@@ -1,0 +1,22 @@
+{
+  "contract_name": "User",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    }
+  ],
+  "unlinked_binary": "0x60606040525b60008054600160a060020a03191633600160a060020a03161790555b5b608480602f6000396000f300606060405263ffffffff60e060020a6000350416638da5cb5b81146020575bfe5b3415602757fe5b602d6049565b60408051600160a060020a039092168252519081900360200190f35b600054600160a060020a0316815600a165627a7a723058200865e19cee1a1a579afc88bb85a6c9fea531ffb80b27690e303d825c39948ef50029",
+  "networks": {},
+  "schema_version": "0.0.5",
+  "updated_at": 1503940507478
+}
