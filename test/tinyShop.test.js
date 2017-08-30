@@ -4,6 +4,7 @@ const expectedExceptionPromise = require('./expected_exception_testRPC_and_geth'
 contract('tinyShop', (accounts) => {
   const owner = accounts[0];
   const admin = accounts[1];
+  const user = accounts[2];
 
   let contract;
 
@@ -21,77 +22,141 @@ contract('tinyShop', (accounts) => {
       });
   });
 
-  it('be able to get the Admin count', () => {
-    return contract.getAdminCount({from:owner})
-      .then( (count) => {
-        assert.equal(count, 1, "Contract does not have the owner as admin");
-      });
+  describe('User functionality', () => {
+
+    it('be able to get the Admin count', () => {
+      return contract.getAdminCount({from:owner})
+        .then( (count) => {
+          assert.equal(count, 1, "Contract does not have the owner as admin");
+        });
+    });
+
+    it('be able to return an Admin at specific index', () => {
+      return contract.getAdminAtIndex(0,{from:owner})
+        .then( (_address) => {
+          assert.equal(_address, owner, "Contract does not have the owner in adminsIndex");
+        });
+    });
+
+    it('the owner should be an administrator', () => {
+      return contract.isAdmin(owner, {from: owner})
+        .then( (isAdmin) => {
+          assert.isTrue(isAdmin, "The owner is not an admin by default");
+        });
+    });
+
+    it('the owner should able to tell a non-admin address', () => {
+      return contract.isAdmin(accounts[1], {from: owner})
+        .then( (isAdmin) => {
+          assert.isFalse(isAdmin, "The non-admin address is marked as admin");
+        });
+    });
+
+    it('the owner should be able to add other administrators', () => {
+      return contract.addAdmin(admin, {from: owner})
+        .then( (tx) => {
+          const eventAddress = tx.logs[0].args.adminAddress;
+          const addedAt = tx.logs[0].args.adminIndex;
+          assert.equal(eventAddress, admin, "The second admin's address was not correct");
+          assert.equal(addedAt, 1, "The second admin index is not correct");
+          return contract.isAdmin(admin, {from: owner});
+        })
+        .then( (isAdmin) => {
+          assert.isTrue(isAdmin, "The admin was not created");
+          return contract.getAdminCount({from:owner});
+        })
+        .then( (count) => {
+          assert.equal(count, 2, "The Contract does not have enough admins");
+        });
+    });
+
+    it('the owner should be able to remove other administrators', () => {
+      return contract.addAdmin(admin, {from: owner})
+        .then( (tx) => {
+          return contract.isAdmin(admin, {from: owner});
+        })
+        .then( (isAdmin) => {
+          assert.isTrue(isAdmin, "The admin was not created");
+          return contract.getAdminCount({from:owner});
+        })
+        .then( (count) => {
+          assert.equal(count, 2, "The Contract does not have enough admins");
+          return contract.removeAdmin(admin, {from: owner});
+        })
+        .then( (tx) => {
+          return contract.getAdminCount({from:owner});
+        })
+        .then( (count) => {
+          assert.equal(count, 1, "The Contract does not have the right amount of admins");
+        });
+    });
+
+    it('the owner should not be able to remove self as an administrator', () => {
+      return expectedExceptionPromise( () => {
+        return contract.removeAdmin(owner, {from: owner}, 3000000);
+      })
+    });
   });
 
-  it('be able to return an Admin at specific index', () => {
-    return contract.getAdminAtIndex(0,{from:owner})
-      .then( (_address) => {
-        assert.equal(_address, owner, "Contract does not have the owner in adminsIndex");
-      });
-  });
+  describe('Product functionality', () => {
 
-  it('the owner should be an administrator', () => {
-    return contract.isAdmin(owner, {from: owner})
-      .then( (isAdmin) => {
-        assert.isTrue(isAdmin, "The owner is not an admin by default");
+    describe('.addProduct', () => {
+      xit('an admin can create a new product', () => {
+        const newProduct = {
+                name: "New Product",
+                price: 1,
+                stock: 1
+              }
+        return contract.addProduct(newProduct, {from: owner})
+          .then( tx => {
+            const productName = tx.logs[0].args.name;
+            const productPrice = tx.logs[0].args.price;
+            const productStock = tx.logs[0].args.stock;
+            const productIndex = tx.logs[0].args.index;
+            assert.equal(productName, newProduct.name, "Product name is wrong");
+            assert.equal(productPrice, newProduct.price, "Product price is wrong");
+            assert.equal(productStock, newProduct.stock, "Product stock is wrong");
+            assert.equal(productIndex, 0, "Product index is wrong");
+          });
       });
-  });
 
-  it('the owner should able to tell a non-admin address', () => {
-    return contract.isAdmin(accounts[1], {from: owner})
-      .then( (isAdmin) => {
-        assert.isFalse(isAdmin, "The non-admin address is marked as admin");
+      xit('a non-admin cannot create a product', () => {
+
       });
-  });
+    });
 
-  it('the owner should be able to add other administrators', () => {
-    return contract.addAdmin(admin, {from: owner})
-      .then( (tx) => {
-        const eventAddress = tx.logs[0].args.adminAddress;
-        const addedAt = tx.logs[0].args.adminIndex;
-        assert.equal(eventAddress, admin, "The second admin's address was not correct");
-        assert.equal(addedAt, 1, "The second admin index is not correct");
-        return contract.isAdmin(admin, {from: owner});
-      })
-      .then( (isAdmin) => {
-        assert.isTrue(isAdmin, "The admin was not created");
-        return contract.getAdminCount({from:owner});
-      })
-      .then( (count) => {
-        assert.equal(count, 2, "The Contract does not have enough admins");
+    describe('.isProduct', () => {
+      it('it should report false if product does not exist', () => {
+        return contract.isProduct('not a product', {from: owner})
+          .then( (isProduct) => {
+            assert.isFalse(isProduct, "The product should not be true");
+          });
       });
-  });
 
-  it('the owner should be able to remove other administrators', () => {
-    return contract.addAdmin(admin, {from: owner})
-      .then( (tx) => {
-        return contract.isAdmin(admin, {from: owner});
-      })
-      .then( (isAdmin) => {
-        assert.isTrue(isAdmin, "The admin was not created");
-        return contract.getAdminCount({from:owner});
-      })
-      .then( (count) => {
-        assert.equal(count, 2, "The Contract does not have enough admins");
-        return contract.removeAdmin(admin, {from: owner});
-      })
-      .then( (tx) => {
-        return contract.getAdminCount({from:owner});
-      })
-      .then( (count) => {
-        assert.equal(count, 1, "The Contract does not have the right amount of admins");
+      xit('it should report true once the product is created', () => {
+
       });
-  });
+    });
 
-  it('the owner should not be able to remove self as an administrator', () => {
-    return expectedExceptionPromise( () => {
-      return contract.removeAdmin(owner, {from: owner}, 3000000);
-    })
+    describe('.productCount', () => {
+      it('starts with 0 products', () => {
+        return contract.productCount({from:owner})
+        .then( count => {
+          assert.equal(count, 0, "")
+        }
+      });
+
+      xit('after creating a product it reports the proper length', () => {
+
+      });
+    });
+
+    describe('.getProductAtIndex', () => {
+      xit('can return a product when given an index', () => {
+
+      });
+    });
+
   });
 
   // as an administrator, you can add products, which consist of an id, a price and a stock.
