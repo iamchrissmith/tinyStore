@@ -1,4 +1,5 @@
 const tinyShop = artifacts.require('./tinyShop.sol');
+const expectedExceptionPromise = require('./expected_exception_testRPC_and_geth');
 
 contract('tinyShop', (accounts) => {
   const owner = accounts[0];
@@ -41,6 +42,13 @@ contract('tinyShop', (accounts) => {
       });
   });
 
+  it('the owner should able to tell a non-admin address', () => {
+    return contract.isAdmin(accounts[1], {from: owner})
+      .then( (isAdmin) => {
+        assert.isFalse(isAdmin, "The non-admin address is marked as admin");
+      });
+  });
+
   it('the owner should be able to add other administrators', () => {
     return contract.addAdmin(admin, {from: owner})
       .then( (tx) => {
@@ -57,6 +65,33 @@ contract('tinyShop', (accounts) => {
       .then( (count) => {
         assert.equal(count, 2, "The Contract does not have enough admins");
       });
+  });
+
+  it('the owner should be able to remove other administrators', () => {
+    return contract.addAdmin(admin, {from: owner})
+      .then( (tx) => {
+        return contract.isAdmin(admin, {from: owner});
+      })
+      .then( (isAdmin) => {
+        assert.isTrue(isAdmin, "The admin was not created");
+        return contract.getAdminCount({from:owner});
+      })
+      .then( (count) => {
+        assert.equal(count, 2, "The Contract does not have enough admins");
+        return contract.removeAdmin(admin, {from: owner});
+      })
+      .then( (tx) => {
+        return contract.getAdminCount({from:owner});
+      })
+      .then( (count) => {
+        assert.equal(count, 1, "The Contract does not have the right amount of admins");
+      });
+  });
+
+  it('the owner should not be able to remove self as an administrator', () => {
+    return expectedExceptionPromise( () => {
+      return contract.removeAdmin(owner, {from: owner}, 3000000);
+    })
   });
 
   // as an administrator, you can add products, which consist of an id, a price and a stock.

@@ -10,7 +10,8 @@ contract tinyShop is Owned, User{
     insertAdmin(msg.sender);
   }
 
-  event LogNewAdmin(address adminAddress, uint adminIndex);
+  event LogNewAdmin(address indexed adminAddress, uint adminIndex);
+  event LogRemovedAdmin(address indexed adminAddress);
 
   function addAdmin(address newAddress)
     public
@@ -18,8 +19,25 @@ contract tinyShop is Owned, User{
   {
     require(!isAdmin(newAddress));
     require(msg.sender == owner);
+
     uint newIndex = insertAdmin(newAddress);
     LogNewAdmin(newAddress, newIndex);
+
     return true;
+  }
+
+  function removeAdmin(address removable)
+    public
+    returns(bool success)
+  {
+    require(msg.sender == owner);
+    require(removable != owner);
+    require(isAdmin(removable));
+
+    deleteAdmin(removable);
+    LogRemovedAdmin(removable);
+
+    return true;
+
   }
 }

@@ -8,6 +8,9 @@ contract User {
   mapping(address => UserStruct) public userStructs;
   address[] public adminsIndex;
 
+  event LogUpdatedUser(address indexed userAddress, uint adminIndex);
+  event LogIsAdmin(address adminAddress, uint adminIndex, bool isAdmin);
+
   function insertAdmin(address newAddress)
     public
     returns(uint newIndex)
@@ -15,6 +18,21 @@ contract User {
     userStructs[newAddress].adminIndex = adminsIndex.push(newAddress) - 1;
 
     return (adminsIndex.length - 1);
+  }
+
+  function deleteAdmin(address oldAddress)
+    public
+    returns(bool success)
+  {
+    uint rowToDelete = userStructs[oldAddress].adminIndex;
+    address keyToMove = adminsIndex[adminsIndex.length - 1];
+
+    adminsIndex[rowToDelete] = keyToMove;
+    userStructs[keyToMove].adminIndex = rowToDelete;
+    adminsIndex.length--;
+
+    LogUpdatedUser(keyToMove, rowToDelete);
+    return true;
   }
 
   function isAdmin( address adminAddress)
