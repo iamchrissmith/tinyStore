@@ -9,7 +9,6 @@ contract User {
   address[] public adminsIndex;
 
   event LogUpdatedUser(address indexed userAddress, uint adminIndex);
-  event LogIsAdmin(address adminAddress, uint adminIndex, bool isAdmin);
 
   function insertAdmin(address newAddress)
     public
