@@ -13,7 +13,14 @@ contract tinyShop is Owned, User, Product{
   event LogNewAdmin(address indexed adminAddress, uint adminIndex);
   event LogRemovedAdmin(address indexed adminAddress);
 
-  event LogNewProduct(bytes32 sku, string name, uint price, uint stock, uint index);
+  event LogNewProduct(
+          bytes16 sku,
+          string name,
+          uint price,
+          uint stock,
+          address owner,
+          uint index);
+  event LogRemovedProduct(bytes16 sku);
 
   function addAdmin(address newAddress)
     public
@@ -43,7 +50,7 @@ contract tinyShop is Owned, User, Product{
 
   }
 
-  function addProduct(bytes32 sku, string name, uint price, uint stock)
+  function addProduct(bytes16 sku, string name, uint price, uint stock)
     public
     returns(bool success)
   {
@@ -51,7 +58,21 @@ contract tinyShop is Owned, User, Product{
     require(!isProduct(sku));
 
     uint newIndex = insertProduct(sku, name, price, stock);
-    LogNewProduct(sku, name, price, stock, newIndex);
+    LogNewProduct(sku, name, price, stock, msg.sender, newIndex);
+
+    return true;
+  }
+
+  function removeProduct(bytes16 sku)
+    public
+    returns(bool success)
+  {
+    require(isProduct(sku));
+    require(productStructs[sku].owner == msg.sender);
+    // eventually we will need to make sure we handle unfinished payments
+
+    deleteProduct(sku);
+    LogRemovedProduct(sku);
 
     return true;
   }

@@ -5,16 +5,19 @@ contract Product {
     string name;
     uint price;
     uint stock;
+    address owner;
     uint index;
   }
 
-  mapping(bytes32 => ProductStruct) internal productStructs;
-  bytes32[] internal productIndex;
+  mapping(bytes16 => ProductStruct) internal productStructs;
+  bytes16[] internal productIndex;
 
-  event LogUpdateProduct(
+  event LogUpdatedProduct(
+          bytes16 sku,
           string name,
           uint price,
           uint stock,
+          address owner,
           uint index
         );
 
@@ -27,7 +30,7 @@ contract Product {
   }
 
 
-  function insertProduct(bytes32 sku, string name, uint price, uint stock)
+  function insertProduct(bytes16 sku, string name, uint price, uint stock)
     internal
     returns(uint newIndex)
   {
@@ -35,11 +38,12 @@ contract Product {
     productStructs[sku].name = name;
     productStructs[sku].price = price;
     productStructs[sku].stock = stock;
+    productStructs[sku].owner = msg.sender;
 
     return (productIndex.length - 1);
   }
 
-  function isProduct(bytes32 sku)
+  function isProduct(bytes16 sku)
     public
     constant
     returns(bool isIndeed)
@@ -52,8 +56,28 @@ contract Product {
   function getProductAtIndex(uint index)
     public
     constant
-    returns(bytes32 sku)
+    returns(bytes16 sku)
   {
     return productIndex[index];
+  }
+
+  function deleteProduct(bytes16 sku)
+    internal
+  {
+    uint rowToDelete = productStructs[sku].index;
+    bytes16 skuToMove = productIndex[productIndex.length - 1];
+
+    productIndex[rowToDelete] = skuToMove;
+    productStructs[skuToMove].index = rowToDelete;
+    productIndex.length--;
+
+    LogUpdatedProduct(
+      skuToMove,
+      productStructs[skuToMove].name,
+      productStructs[skuToMove].price,
+      productStructs[skuToMove].stock,
+      productStructs[skuToMove].owner,
+      productStructs[skuToMove].index
+    );
   }
 }

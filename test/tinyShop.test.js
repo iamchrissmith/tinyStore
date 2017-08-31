@@ -109,10 +109,12 @@ contract('tinyShop', (accounts) => {
             const productPrice = tx.logs[0].args.price;
             const productStock = tx.logs[0].args.stock;
             const productIndex = tx.logs[0].args.index;
+            const productOwner = tx.logs[0].args.owner;
             assert.equal(productName, "New Product", "Product name is wrong");
             assert.equal(productPrice, 2, "Product price is wrong");
             assert.equal(productStock, 1, "Product stock is wrong");
             assert.equal(productIndex, 0, "Product index is wrong");
+            assert.equal(productOwner, owner, "Product owner is wrong");
             return contract.isProduct(productSku,{from:owner});
           })
           .then( isProduct => {
@@ -126,8 +128,8 @@ contract('tinyShop', (accounts) => {
 
       it('a non-admin cannot create a product', () => {
         return expectedExceptionPromise( () => {
-          return contract.addProduct("New Product", "New Product", 2, 1, {from: owner});
-        })
+          return contract.addProduct("New Product", "New Product", 2, 1, {from: user});
+        }, 3000000);
       });
     });
 
@@ -162,6 +164,50 @@ contract('tinyShop', (accounts) => {
           })
       });
     });
+
+    describe('.removeProduct', () => {
+      it('the product owner can delete the product', () => {
+        let productSku;
+        return contract.addAdmin(admin, {from: owner})
+          .then( (tx) => {
+            return contract.addProduct("New Product", "New Product", 2, 1, {from: admin})
+          })
+          .then( (tx) => {
+            productSku = tx.logs[0].args.sku;
+            return contract.isProduct(productSku, {from: admin});
+          })
+          .then( (isProduct) => {
+            assert.isTrue(isProduct, "The product was not created");
+            return contract.removeProduct(productSku, {from: admin});
+          })
+          .then( (tx) => {
+            return contract.isProduct(productSku, {from:admin});
+          })
+          .then( (isProduct) => {
+            assert.isFalse(isProduct, "Product was not deleted");
+          });
+      });
+
+      it('cannot delete product if not owner of product', () => {
+        let productSku;
+        return contract.addAdmin(admin, {from: owner})
+          .then( (tx) => {
+            return contract.addProduct("New Product", "New Product", 2, 1, {from: admin})
+          })
+          .then( (tx) => {
+            productSku = tx.logs[0].args.sku;
+            const productOwner = tx.logs[0].args.owner;
+            assert.equal(productOwner, admin, "Product owner is wrong");
+            return contract.isProduct(productSku, {from: owner});
+          })
+          .then( (isProduct) => {
+            assert.isTrue(isProduct, "The product was not created");
+            return expectedExceptionPromise( () => {
+              return contract.removeProduct(productSku, {from: owner});
+            }, 3000000);
+          });
+      });
+    })
 
   });
 
