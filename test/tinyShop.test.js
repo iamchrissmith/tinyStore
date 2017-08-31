@@ -104,7 +104,7 @@ contract('tinyShop', (accounts) => {
       it('an admin can create a new product', () => {
         return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
           .then( tx => {
-            // console.log(tx.logs[0].args);
+            const productSku = tx.logs[0].args.sku;
             const productName = tx.logs[0].args.name;
             const productPrice = tx.logs[0].args.price;
             const productStock = tx.logs[0].args.stock;
@@ -113,11 +113,21 @@ contract('tinyShop', (accounts) => {
             assert.equal(productPrice, 2, "Product price is wrong");
             assert.equal(productStock, 1, "Product stock is wrong");
             assert.equal(productIndex, 0, "Product index is wrong");
-          });
+            return contract.isProduct(productSku,{from:owner});
+          })
+          .then( isProduct => {
+            assert.isTrue(isProduct);
+            return contract.getProductCount({from:owner});
+          })
+          .then( count => {
+            assert.equal(count, 1, "Contract did increase number of products");
+          })
       });
 
-      xit('a non-admin cannot create a product', () => {
-
+      it('a non-admin cannot create a product', () => {
+        return expectedExceptionPromise( () => {
+          return contract.addProduct("New Product", "New Product", 2, 1, {from: owner});
+        })
       });
     });
 
@@ -128,30 +138,28 @@ contract('tinyShop', (accounts) => {
             assert.isFalse(isProduct, "The product should not be true");
           });
       });
-
-      xit('it should report true once the product is created', () => {
-
-      });
     });
 
     describe('.getProductCount', () => {
-      xit('starts with 0 products', () => {
-        console.log(contract);
-        eval(pry.it);
+      it('starts with 0 products', () => {
         return contract.getProductCount({from:owner})
         .then( count => {
-          assert.equal(count, 0, "")
+          assert.equal(count, 0, "Contract did not start with 0 products")
         });
-      });
-
-      xit('after creating a product it reports the proper length', () => {
-
       });
     });
 
     describe('.getProductAtIndex', () => {
-      xit('can return a product when given an index', () => {
-
+      it('can return a product when given an index', () => {
+        let productSku;
+        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
+          .then( tx => {
+            productSku = tx.logs[0].args.sku;
+            return contract.getProductAtIndex(0,{from:owner});
+          })
+          .then( sku => {
+            assert.equal(sku, productSku, "Returned SKU does not match");
+          })
       });
     });
 
