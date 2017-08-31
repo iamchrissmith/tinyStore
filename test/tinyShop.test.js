@@ -101,21 +101,17 @@ contract('tinyShop', (accounts) => {
   describe('Product functionality', () => {
 
     describe('.addProduct', () => {
-      xit('an admin can create a new product', () => {
-        const newProduct = {
-                name: "New Product",
-                price: 1,
-                stock: 1
-              }
-        return contract.addProduct(newProduct, {from: owner})
+      it('an admin can create a new product', () => {
+        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
           .then( tx => {
+            // console.log(tx.logs[0].args);
             const productName = tx.logs[0].args.name;
             const productPrice = tx.logs[0].args.price;
             const productStock = tx.logs[0].args.stock;
             const productIndex = tx.logs[0].args.index;
-            assert.equal(productName, newProduct.name, "Product name is wrong");
-            assert.equal(productPrice, newProduct.price, "Product price is wrong");
-            assert.equal(productStock, newProduct.stock, "Product stock is wrong");
+            assert.equal(productName, "New Product", "Product name is wrong");
+            assert.equal(productPrice, 2, "Product price is wrong");
+            assert.equal(productStock, 1, "Product stock is wrong");
             assert.equal(productIndex, 0, "Product index is wrong");
           });
       });
@@ -138,12 +134,14 @@ contract('tinyShop', (accounts) => {
       });
     });
 
-    describe('.productCount', () => {
-      it('starts with 0 products', () => {
-        return contract.productCount({from:owner})
+    describe('.getProductCount', () => {
+      xit('starts with 0 products', () => {
+        console.log(contract);
+        eval(pry.it);
+        return contract.getProductCount({from:owner})
         .then( count => {
           assert.equal(count, 0, "")
-        }
+        });
       });
 
       xit('after creating a product it reports the proper length', () => {

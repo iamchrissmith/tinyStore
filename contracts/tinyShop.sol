@@ -2,9 +2,9 @@ pragma solidity ^0.4.6;
 
 import "./Owned.sol";
 import "./User.sol";
-/*import "./Product.sol";*/
+import "./Product.sol";
 
-contract tinyShop is Owned, User{
+contract tinyShop is Owned, User, Product{
 
   function tinyShop() {
     insertAdmin(msg.sender);
@@ -12,6 +12,8 @@ contract tinyShop is Owned, User{
 
   event LogNewAdmin(address indexed adminAddress, uint adminIndex);
   event LogRemovedAdmin(address indexed adminAddress);
+
+  event LogNewProduct(bytes32 sku, string name, uint price, uint stock, uint index);
 
   function addAdmin(address newAddress)
     public
@@ -39,5 +41,18 @@ contract tinyShop is Owned, User{
 
     return true;
 
+  }
+
+  function addProduct(bytes32 sku, string name, uint price, uint stock)
+    public
+    returns(bool success)
+  {
+    require(isAdmin(msg.sender));
+    require(!isProduct(sku));
+
+    uint newIndex = insertProduct(sku, name, price, stock);
+    LogNewProduct(sku, name, price, stock, newIndex);
+
+    return true;
   }
 }

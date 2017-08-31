@@ -1,8 +1,85 @@
 {
   "contract_name": "Product",
-  "abi": [],
-  "unlinked_binary": "0x60606040523415600b57fe5b5b60338060196000396000f30060606040525bfe00a165627a7a72305820de35663840605a8f9abf576d1830f2d52f0364334bc56c708135f1777e9eb3310029",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getProductCount",
+      "outputs": [
+        {
+          "name": "count",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isProduct",
+      "outputs": [
+        {
+          "name": "isIndeed",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getProductAtIndex",
+      "outputs": [
+        {
+          "name": "name",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "name",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "stock",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogUpdateProduct",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x6060604052341561000c57fe5b5b61014f8061001c6000396000f300606060405263ffffffff60e060020a6000350416634a348da981146100375780635f65faf114610059578063776059ec14610080575bfe5b341561003f57fe5b6100476100a5565b60408051918252519081900360200190f35b341561006157fe5b61006c6004356100ac565b604080519115158252519081900360200190f35b341561008857fe5b6100476004356100fa565b60408051918252519081900360200190f35b6001545b90565b60015460009015156100c0575060006100f5565b6000828152602081905260409020600301546001805484929081106100e157fe5b906000526020600020900160005b50541490505b919050565b600060018281548110151561010b57fe5b906000526020600020900160005b505490505b9190505600a165627a7a72305820c57a5543aebe94e54a643db330fdaf74c1bfe30bb9d5fe76dc91cf92c5cf14ac0029",
   "networks": {},
   "schema_version": "0.0.5",
-  "updated_at": 1503937723582
+  "updated_at": 1504198919689
 }

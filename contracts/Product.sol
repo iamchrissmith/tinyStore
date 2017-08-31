@@ -2,7 +2,7 @@ pragma solidity ^0.4.6;
 
 contract Product {
   struct ProductStruct {
-    bytes32 name;
+    string name;
     uint price;
     uint stock;
     uint index;
@@ -12,18 +12,48 @@ contract Product {
   bytes32[] internal productIndex;
 
   event LogUpdateProduct(
-          bytes32 name,
+          string name,
           uint price,
           uint stock,
           uint index
         );
 
-  function insertProduct(bytes32 name)
+  function getProductCount()
+    public
+    constant
+    returns(uint count)
+  {
+    return productIndex.length;
+  }
+
+
+  function insertProduct(bytes32 sku, string name, uint price, uint stock)
     internal
     returns(uint newIndex)
   {
-    productStructs[name].index = productIndex.push(newAddress) - 1;
+    productStructs[sku].index = productIndex.push(sku) - 1;
+    productStructs[sku].name = name;
+    productStructs[sku].price = price;
+    productStructs[sku].stock = stock;
 
     return (productIndex.length - 1);
+  }
+
+  function isProduct(bytes32 sku)
+    public
+    constant
+    returns(bool isIndeed)
+  {
+    if(productIndex.length == 0) return false;
+
+    return (productIndex[productStructs[sku].index] ==  sku);
+  }
+
+  function getProductAtIndex(uint index)
+    public
+    constant
+    returns(bytes32 sku)
+  {
+    return productIndex[index];
   }
 }
