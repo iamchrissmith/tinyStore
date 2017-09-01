@@ -21,6 +21,12 @@ contract tinyShop is Owned, User, Product{
           address owner,
           uint index);
   event LogRemovedProduct(bytes16 sku);
+  event LogProductPurchase(
+          bytes16 sku,
+          uint newStock,
+          address owner,
+          address purchaser
+    );
 
   function addAdmin(address newAddress)
     public
@@ -76,4 +82,33 @@ contract tinyShop is Owned, User, Product{
 
     return true;
   }
+
+  function buyProduct(bytes16 sku)
+    public
+    payable
+    returns(bool success)
+  {
+    require(isProduct(sku));
+    require(productStructs[sku].owner != msg.sender);
+    require(productStructs[sku].stock > 0);
+    require(productStructs[sku].price == msg.value);
+
+    productStructs[sku].stock--;
+
+    LogProductPurchase(
+      sku,
+      productStructs[sku].stock,
+      productStructs[sku].owner,
+      msg.sender
+    );
+
+    return true;
+
+
+  }
+
+  // User pays money into the product
+  // Reject if it is not equal to the price of the product
+  // Reject if there are 0 stock of the product
+  // Log purchase, reduce stock, allow owner to withdraw
 }

@@ -211,6 +211,74 @@ contract('tinyShop', (accounts) => {
 
   });
 
+  describe('Purchasing', () => {
+    describe('.buyProduct', () => {
+      it('a user should be able to purchase a product', () => {
+        let productSku;
+        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
+        .then( tx => {
+          productSku = tx.logs[0].args.sku;
+          return contract.buyProduct(productSku,{from:user, value:2});
+        })
+        .then( tx => {
+          const eventLog = tx.logs[0].args;
+          assert.equal(eventLog.purchaser, user, "User was not the purchaser");
+          assert.equal(eventLog.owner, owner, "Owner was not reported correctly");
+          assert.equal(eventLog.newStock.toString(10), "0", "Product stock did not change");
+          assert.equal(eventLog.sku, productSku, "Product sku incorrect");
+        });
+      });
+
+      it('the owner should not be able to purchase their own product', () => {
+        let productSku;
+        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
+          .then( tx => {
+            productSku = tx.logs[0].args.sku;
+            return expectedExceptionPromise( () => {
+              return contract.buyProduct(productSku,{from:owner, value:2});
+            });
+          });
+      });
+
+      it('a user should not be able to purchase a product when stock == 0', () => {
+        let productSku;
+        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
+          .then( tx => {
+            productSku = tx.logs[0].args.sku;
+            return contract.buyProduct(productSku,{from:user, value:2});
+          })
+          .then( tx => {
+            assert.equal(tx.logs[0].args.newStock.toString(10), "0", "Product stock did not change");
+            return expectedExceptionPromise( () => {
+              return contract.buyProduct(productSku,{from:user, value:2});
+            });
+          });
+      });
+
+      it('a user must send the exact price - too low', () => {
+        let productSku;
+        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
+          .then( tx => {
+            productSku = tx.logs[0].args.sku;
+            return expectedExceptionPromise( () => {
+              return contract.buyProduct(productSku,{from:user, value:1});
+            });
+          });
+      });
+
+      it('a user must send the exact price - too high', () => {
+        let productSku;
+        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
+          .then( tx => {
+            productSku = tx.logs[0].args.sku;
+            return expectedExceptionPromise( () => {
+              return contract.buyProduct(productSku,{from:user, value:3});
+            });
+          });
+      });
+    });
+  });
+
   // as an administrator, you can add products, which consist of an id, a price and a stock.
   // as a regular user you can buy 1 of the products.
   // as the owner you can make payments or withdraw value from the contract.
