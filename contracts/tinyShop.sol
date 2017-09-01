@@ -6,6 +6,8 @@ import "./Product.sol";
 
 contract tinyShop is Owned, User, Product{
 
+  mapping(address => uint) public balances;
+
   function tinyShop() {
     insertAdmin(msg.sender);
   }
@@ -27,6 +29,7 @@ contract tinyShop is Owned, User, Product{
           address owner,
           address purchaser
     );
+  event LogFundsSent(address recipient, uint amount);
 
   function addAdmin(address newAddress)
     public
@@ -94,6 +97,7 @@ contract tinyShop is Owned, User, Product{
     require(productStructs[sku].price == msg.value);
 
     productStructs[sku].stock--;
+    balances[productStructs[sku].owner] += msg.value;
 
     LogProductPurchase(
       sku,
@@ -103,12 +107,19 @@ contract tinyShop is Owned, User, Product{
     );
 
     return true;
-
-
   }
 
-  // User pays money into the product
-  // Reject if it is not equal to the price of the product
-  // Reject if there are 0 stock of the product
-  // Log purchase, reduce stock, allow owner to withdraw
+  function withdrawFunds()
+    public
+    returns(bool success)
+  {
+    require(balances[msg.sender] > 0);
+    uint balanceToSend = balances[msg.sender];
+    balances[msg.sender] = 0;
+    LogFundsSent(msg.sender, balanceToSend);
+
+    msg.sender.transfer(balanceToSend);
+
+    return true;
+  }
 }

@@ -277,15 +277,37 @@ contract('tinyShop', (accounts) => {
           });
       });
     });
+    describe('.withdrawFunds', () => {
+      it('after a purchase the owner should be able to withdraw their funds', () => {
+        const gasPrice = 1;
+        const amount = 20000;
+        let transactionCost;
+        let ownerBalance;
+        let productSku;
+        return contract.addProduct("New Product", "New Product", amount, 1, {from: owner, gasPrice: gasPrice})
+        .then( tx => {
+          productSku = tx.logs[0].args.sku;
+          return web3.eth.getBalance(owner)
+        })
+        .then( balance => {
+          ownerBalance = balance;
+          return contract.buyProduct(productSku,{from:user, value:amount});
+        })
+        .then( tx => {
+          return contract.balances(owner, {from:owner})
+        })
+        .then( contractBalance => {
+          assert.equal(contractBalance.toString(10), amount.toString(10), "Owner balance incorrect");
+          return contract.withdrawFunds({from:owner, gasPrice: gasPrice});
+        })
+        .then( tx => {
+          transactionCost = tx.receipt.gasUsed * gasPrice;
+          return web3.eth.getBalance(owner)
+        })
+        .then( (newBalance) => {
+          assert.equal(ownerBalance.plus(amount).minus(transactionCost).toString(10), newBalance.toString(10), `Owner balance did not increase by ${amount}`);
+        });
+      })
+    });
   });
-
-  // as an administrator, you can add products, which consist of an id, a price and a stock.
-  // as a regular user you can buy 1 of the products.
-  // as the owner you can make payments or withdraw value from the contract.
-
-  // Eventually, you will refactor it to include:
-    // ability to remove products.
-    // co-purchase by different people.
-    // add merchants akin to what Amazon has become.
-    // add the ability to pay with a third-party token.
 });
