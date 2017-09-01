@@ -4,7 +4,7 @@ import "./Owned.sol";
 import "./User.sol";
 import "./Product.sol";
 
-contract tinyShop is Owned, User, Product{
+contract TinyShop is Owned, User, Product {
 
   mapping(address => uint) public balances;
 
