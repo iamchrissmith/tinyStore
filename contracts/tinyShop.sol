@@ -16,15 +16,15 @@ contract TinyShop is Owned, User, Product {
   event LogRemovedAdmin(address indexed adminAddress);
 
   event LogNewProduct(
-          bytes16 sku,
+          bytes32 sku,
           string name,
           uint price,
           uint stock,
           address owner,
           uint index);
-  event LogRemovedProduct(bytes16 sku);
+  event LogRemovedProduct(bytes32 sku);
   event LogProductPurchase(
-          bytes16 sku,
+          bytes32 sku,
           uint newStock,
           address owner,
           address purchaser
@@ -59,7 +59,7 @@ contract TinyShop is Owned, User, Product {
 
   }
 
-  function addProduct(bytes16 sku, string name, uint price, uint stock)
+  function addProduct(bytes32 sku, string name, uint price, uint stock)
     public
     returns(bool success)
   {
@@ -72,7 +72,7 @@ contract TinyShop is Owned, User, Product {
     return true;
   }
 
-  function removeProduct(bytes16 sku)
+  function removeProduct(bytes32 sku)
     public
     returns(bool success)
   {
@@ -86,7 +86,7 @@ contract TinyShop is Owned, User, Product {
     return true;
   }
 
-  function buyProduct(bytes16 sku)
+  function buyProduct(bytes32 sku)
     public
     payable
     returns(bool success)
