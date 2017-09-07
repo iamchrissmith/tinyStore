@@ -1,125 +1,48 @@
 pragma solidity ^0.4.6;
 
-import "./Owned.sol";
-import "./User.sol";
+import "./Adminable.sol";
 import "./Product.sol";
 
-contract TinyShop is Owned, User, Product {
+contract TinyShop is Adminable, Stoppable {
+    
+    address[] public products;
+    
+    mapping(address => bool) productExists;
+    
+    modifier onlyIfProduct(address product) {
+        require(productExists[product]);
+        _;
+    }
 
-  mapping(address => uint) public balances;
+    event LogNewProduct(
+          address titleHolder,
+          address product, 
+          string productName, 
+          uint productPrice, 
+          uint currentStock);
+          
+          
+    function TinyShop() {
+        addAdmin(msg.sender);
+    }
+    
+    function getProductCount()
+        public
+        constant
+        returns(uint productCount)
+    {
+        return products.length;
+    }
+    
+    function newProduct(address _titleHolder, string _name, uint _price, uint _stock)
+        public
+        returns(address productContract)
+    {
+        Product trustedProduct = new Product(_titleHolder, _name, _price, _stock);
+        products.push(trustedProduct);
+        productExists[trustedProduct] = true;
+        LogNewProduct(msg.sender, trustedProduct, _name, _price, _stock);
+        return trustedProduct;
+    }
 
-  function tinyShop() {
-    insertAdmin(msg.sender);
-  }
-
-  event LogNewAdmin(address indexed adminAddress, uint adminIndex);
-  event LogRemovedAdmin(address indexed adminAddress);
-
-  event LogNewProduct(
-          bytes32 sku,
-          string name,
-          uint price,
-          uint stock,
-          address owner,
-          uint index);
-  event LogRemovedProduct(bytes32 sku);
-  event LogProductPurchase(
-          bytes32 sku,
-          uint newStock,
-          address owner,
-          address purchaser
-    );
-  event LogFundsSent(address recipient, uint amount);
-
-  function addAdmin(address newAddress)
-    public
-    returns(bool success)
-  {
-    require(!isAdmin(newAddress));
-    require(msg.sender == owner);
-
-    uint newIndex = insertAdmin(newAddress);
-    LogNewAdmin(newAddress, newIndex);
-
-    return true;
-  }
-
-  function removeAdmin(address removable)
-    public
-    returns(bool success)
-  {
-    require(msg.sender == owner);
-    require(removable != owner);
-    require(isAdmin(removable));
-
-    deleteAdmin(removable);
-    LogRemovedAdmin(removable);
-
-    return true;
-
-  }
-
-  function addProduct(bytes32 sku, string name, uint price, uint stock)
-    public
-    returns(bool success)
-  {
-    require(isAdmin(msg.sender));
-    require(!isProduct(sku));
-
-    uint newIndex = insertProduct(sku, name, price, stock);
-    LogNewProduct(sku, name, price, stock, msg.sender, newIndex);
-
-    return true;
-  }
-
-  function removeProduct(bytes32 sku)
-    public
-    returns(bool success)
-  {
-    require(isProduct(sku));
-    require(productStructs[sku].owner == msg.sender);
-    // eventually we will need to make sure we handle unfinished payments
-
-    deleteProduct(sku);
-    LogRemovedProduct(sku);
-
-    return true;
-  }
-
-  function buyProduct(bytes32 sku)
-    public
-    payable
-    returns(bool success)
-  {
-    require(isProduct(sku));
-    require(productStructs[sku].owner != msg.sender);
-    require(productStructs[sku].stock > 0);
-    require(productStructs[sku].price == msg.value);
-
-    productStructs[sku].stock--;
-    balances[productStructs[sku].owner] += msg.value;
-
-    LogProductPurchase(
-      sku,
-      productStructs[sku].stock,
-      productStructs[sku].owner,
-      msg.sender
-    );
-
-    return true;
-  }
-
-  function withdrawFunds()
-    public
-    returns(bool success)
-  {
-    require(balances[msg.sender] > 0);
-    uint balanceToSend = balances[msg.sender];
-    balances[msg.sender] = 0;
-    LogFundsSent(msg.sender, balanceToSend);
-
-    msg.sender.transfer(balanceToSend);
-
-    return true;
-  }
 }

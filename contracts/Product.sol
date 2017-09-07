@@ -2,7 +2,7 @@ pragma solidity ^0.4.6;
 
 import './Stoppable.sol';
 
-contract Product is Stoppable {
+contract Product is Stoppable{
     
     address public titleHolder;
     string public name;
@@ -19,6 +19,8 @@ contract Product is Stoppable {
     event LogWithdrawal(address recipient, uint amount);
     event LogUpdatedProduct(address sender, string productName, uint productPrice, uint currentStock);
     event LogNewTitleHolder(address sender, address prevHolder, address newHolder);
+    event LogStartSelling(address sender, string productName);
+    event LogStopSelling(address sender, string productName);
     
     function Product(address _titleHolder, string _name, uint _price, uint _stock) {
         titleHolder = _titleHolder;
@@ -37,17 +39,11 @@ contract Product is Stoppable {
         require(stock > 0);
         require(price == msg.value); //may eventually allow purchasing more than one product with amount % price == 0
         
-        stock--;
+        stock = stock - 1;
         balances[titleHolder] += msg.value;
         
-        LogSale(
-          msg.sender,
-          titleHolder,
-          msg.value,
-          stock,
-          balances[titleHolder]
-        );
-        
+        LogSale(msg.sender, titleHolder, msg.value, stock, balances[titleHolder]);
+
         return true;
     }
     
@@ -94,6 +90,26 @@ contract Product is Stoppable {
         
         LogNewTitleHolder(msg.sender, titleHolder, newHolder);
         titleHolder = newHolder;
+        return true;
+    }
+    
+    function startSelling()
+        public
+        onlyHolder
+        returns(bool success)
+    {
+        LogStartSelling(msg.sender, name);
+        running = true;
+        return true;
+    }
+    
+    function stopSelling()
+        public
+        onlyHolder
+        returns(bool success)
+    {
+        LogStopSelling(msg.sender, name);
+        running = false;
         return true;
     }
 }
