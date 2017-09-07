@@ -7,7 +7,7 @@ contract TinyShop is Adminable, Stoppable {
     
     address[] public products;
     
-    mapping(address => bool) productExists;
+    mapping(address => bool) public productExists;
     
     modifier onlyIfProduct(address product) {
         require(productExists[product]);
@@ -15,12 +15,13 @@ contract TinyShop is Adminable, Stoppable {
     }
 
     event LogNewProduct(
-          address titleHolder,
-          address product, 
-          string productName, 
-          uint productPrice, 
-          uint currentStock);
-          
+        address sender,
+        address titleHolder,
+        address product, 
+        string productName, 
+        uint productPrice, 
+        uint currentStock);
+
           
     function TinyShop() {
         addAdmin(msg.sender);
@@ -41,7 +42,7 @@ contract TinyShop is Adminable, Stoppable {
         Product trustedProduct = new Product(_titleHolder, _name, _price, _stock);
         products.push(trustedProduct);
         productExists[trustedProduct] = true;
-        LogNewProduct(msg.sender, trustedProduct, _name, _price, _stock);
+        LogNewProduct(msg.sender, _titleHolder, trustedProduct, _name, _price, _stock);
         return trustedProduct;
     }
 

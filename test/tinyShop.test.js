@@ -100,22 +100,20 @@ contract('tinyShop', (accounts) => {
 
   describe('Product functionality', () => {
 
-    describe('.addProduct', () => {
+    describe('.newProduct', () => {
       it('an admin can create a new product', () => {
-        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
+        return contract.newProduct(owner, "New Product", 2, 1, {from: admin})
           .then( tx => {
-            const productSku = tx.logs[0].args.sku;
-            const productName = tx.logs[0].args.name;
-            const productPrice = tx.logs[0].args.price;
-            const productStock = tx.logs[0].args.stock;
-            const productIndex = tx.logs[0].args.index;
-            const productOwner = tx.logs[0].args.owner;
+            const product = tx.logs[0].args.product;
+            const productName = tx.logs[0].args.productName;
+            const productPrice = tx.logs[0].args.productPrice;
+            const productStock = tx.logs[0].args.currentStock;
+            const titleHolder = tx.logs[0].args.titleHolder;
             assert.equal(productName, "New Product", "Product name is wrong");
-            assert.equal(productPrice, 2, "Product price is wrong");
-            assert.equal(productStock, 1, "Product stock is wrong");
-            assert.equal(productIndex, 0, "Product index is wrong");
-            assert.equal(productOwner, owner, "Product owner is wrong");
-            return contract.isProduct(productSku,{from:owner});
+            assert.equal(productPrice.toString(10), "2", "Product price is wrong");
+            assert.equal(productStock.toString(10), "1", "Product stock is wrong");
+            assert.equal(titleHolder, owner, "Product Title Holder is wrong");
+            return contract.productExists(product,{from:owner});
           })
           .then( isProduct => {
             assert.isTrue(isProduct);
@@ -128,14 +126,14 @@ contract('tinyShop', (accounts) => {
 
       it('a non-admin cannot create a product', () => {
         return expectedExceptionPromise( () => {
-          return contract.addProduct("New Product", "New Product", 2, 1, {from: user});
+          return contract.newProduct("New Product", "New Product", 2, 1, {from: user});
         }, 3000000);
       });
     });
 
     describe('.isProduct', () => {
       it('it should report false if product does not exist', () => {
-        return contract.isProduct('not a product', {from: owner})
+        return contract.productExists('0x0000', {from: owner})
           .then( (isProduct) => {
             assert.isFalse(isProduct, "The product should not be true");
           });
@@ -149,165 +147,6 @@ contract('tinyShop', (accounts) => {
           assert.equal(count, 0, "Contract did not start with 0 products")
         });
       });
-    });
-
-    describe('.getProductAtIndex', () => {
-      it('can return a product when given an index', () => {
-        let productSku;
-        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
-          .then( tx => {
-            productSku = tx.logs[0].args.sku;
-            return contract.getProductAtIndex(0,{from:owner});
-          })
-          .then( sku => {
-            assert.equal(sku, productSku, "Returned SKU does not match");
-          })
-      });
-    });
-
-    describe('.removeProduct', () => {
-      it('the product owner can delete the product', () => {
-        let productSku;
-        return contract.addAdmin(admin, {from: owner})
-          .then( (tx) => {
-            return contract.addProduct("New Product", "New Product", 2, 1, {from: admin})
-          })
-          .then( (tx) => {
-            productSku = tx.logs[0].args.sku;
-            return contract.isProduct(productSku, {from: admin});
-          })
-          .then( (isProduct) => {
-            assert.isTrue(isProduct, "The product was not created");
-            return contract.removeProduct(productSku, {from: admin});
-          })
-          .then( (tx) => {
-            return contract.isProduct(productSku, {from:admin});
-          })
-          .then( (isProduct) => {
-            assert.isFalse(isProduct, "Product was not deleted");
-          });
-      });
-
-      it('cannot delete product if not owner of product', () => {
-        let productSku;
-        return contract.addAdmin(admin, {from: owner})
-          .then( (tx) => {
-            return contract.addProduct("New Product", "New Product", 2, 1, {from: admin})
-          })
-          .then( (tx) => {
-            productSku = tx.logs[0].args.sku;
-            const productOwner = tx.logs[0].args.owner;
-            assert.equal(productOwner, admin, "Product owner is wrong");
-            return contract.isProduct(productSku, {from: owner});
-          })
-          .then( (isProduct) => {
-            assert.isTrue(isProduct, "The product was not created");
-            return expectedExceptionPromise( () => {
-              return contract.removeProduct(productSku, {from: owner});
-            }, 3000000);
-          });
-      });
-    })
-
-  });
-
-  describe('Purchasing', () => {
-    describe('.buyProduct', () => {
-      it('a user should be able to purchase a product', () => {
-        let productSku;
-        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
-        .then( tx => {
-          productSku = tx.logs[0].args.sku;
-          return contract.buyProduct(productSku,{from:user, value:2});
-        })
-        .then( tx => {
-          const eventLog = tx.logs[0].args;
-          assert.equal(eventLog.purchaser, user, "User was not the purchaser");
-          assert.equal(eventLog.owner, owner, "Owner was not reported correctly");
-          assert.equal(eventLog.newStock.toString(10), "0", "Product stock did not change");
-          assert.equal(eventLog.sku, productSku, "Product sku incorrect");
-        });
-      });
-
-      it('the owner should not be able to purchase their own product', () => {
-        let productSku;
-        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
-          .then( tx => {
-            productSku = tx.logs[0].args.sku;
-            return expectedExceptionPromise( () => {
-              return contract.buyProduct(productSku,{from:owner, value:2});
-            });
-          });
-      });
-
-      it('a user should not be able to purchase a product when stock == 0', () => {
-        let productSku;
-        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
-          .then( tx => {
-            productSku = tx.logs[0].args.sku;
-            return contract.buyProduct(productSku,{from:user, value:2});
-          })
-          .then( tx => {
-            assert.equal(tx.logs[0].args.newStock.toString(10), "0", "Product stock did not change");
-            return expectedExceptionPromise( () => {
-              return contract.buyProduct(productSku,{from:user, value:2});
-            });
-          });
-      });
-
-      it('a user must send the exact price - too low', () => {
-        let productSku;
-        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
-          .then( tx => {
-            productSku = tx.logs[0].args.sku;
-            return expectedExceptionPromise( () => {
-              return contract.buyProduct(productSku,{from:user, value:1});
-            });
-          });
-      });
-
-      it('a user must send the exact price - too high', () => {
-        let productSku;
-        return contract.addProduct("New Product", "New Product", 2, 1, {from: owner})
-          .then( tx => {
-            productSku = tx.logs[0].args.sku;
-            return expectedExceptionPromise( () => {
-              return contract.buyProduct(productSku,{from:user, value:3});
-            });
-          });
-      });
-    });
-    describe('.withdrawFunds', () => {
-      it('after a purchase the owner should be able to withdraw their funds', () => {
-        const gasPrice = 1;
-        const amount = 20000;
-        let transactionCost;
-        let ownerBalance;
-        let productSku;
-        return contract.addProduct("New Product", "New Product", amount, 1, {from: owner, gasPrice: gasPrice})
-        .then( tx => {
-          productSku = tx.logs[0].args.sku;
-          return web3.eth.getBalance(owner)
-        })
-        .then( balance => {
-          ownerBalance = balance;
-          return contract.buyProduct(productSku,{from:user, value:amount});
-        })
-        .then( tx => {
-          return contract.balances(owner, {from:owner})
-        })
-        .then( contractBalance => {
-          assert.equal(contractBalance.toString(10), amount.toString(10), "Owner balance incorrect");
-          return contract.withdrawFunds({from:owner, gasPrice: gasPrice});
-        })
-        .then( tx => {
-          transactionCost = tx.receipt.gasUsed * gasPrice;
-          return web3.eth.getBalance(owner)
-        })
-        .then( (newBalance) => {
-          assert.equal(ownerBalance.plus(amount).minus(transactionCost).toString(10), newBalance.toString(10), `Owner balance did not increase by ${amount}`);
-        });
-      })
     });
   });
 });
