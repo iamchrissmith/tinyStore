@@ -1,5 +1,5 @@
 {
-  "name": "tinyshop",
+  "name": "contractfactory",
   "version": "1.0.0",
   "description": "",
   "main": "truffle.js",
@@ -7,9 +7,22 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "truffle test",
+    "start": "node node_modules/.bin/webpack-dev-server --content-base app",
+    "build": "truffle compile && NODE_ENV=production node node_modules/.bin/webpack && cp app/index.html build/app/index.html && cp app/app.css build/app/app.css"
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {}
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "jquery": "^3.2.1",
+    "truffle-contract": "^2.0.5",
+    "web3": "^0.20.1"
+  },
+  "devDependencies": {
+    "create-html": "^4.0.0",
+    "truffle": "^3.4.9",
+    "truffle-solidity-loader": "^0.0.8",
+    "webpack": "^3.5.6"
+  }
 }

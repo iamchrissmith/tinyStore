@@ -1,0 +1,115 @@
+{
+  "contract_name": "Stoppable",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "onOff",
+          "type": "bool"
+        }
+      ],
+      "name": "runSwitch",
+      "outputs": [
+        {
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "changeOwner",
+      "outputs": [
+        {
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "running",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "payable": false,
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "switchSetting",
+          "type": "bool"
+        }
+      ],
+      "name": "LogRunSwitch",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "oldOwner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "LogNewOwner",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x6060604052341561000f57600080fd5b5b5b60008054600160a060020a03191633600160a060020a03161790555b6000805460a060020a60ff021916740100000000000000000000000000000000000000001790555b5b6102d8806100656000396000f300606060405263ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416632dd97058811461005e5780638da5cb5b1461008a578063a6f9dae1146100b9578063d85bd526146100ec575b600080fd5b341561006957600080fd5b6100766004351515610113565b604051901515815260200160405180910390f35b341561009557600080fd5b61009d6101b8565b604051600160a060020a03909116815260200160405180910390f35b34156100c457600080fd5b610076600160a060020a03600435166101c7565b604051901515815260200160405180910390f35b34156100f757600080fd5b61007661028b565b604051901515815260200160405180910390f35b6000805433600160a060020a0390811691161461012f57600080fd5b6000805474ff0000000000000000000000000000000000000000191674010000000000000000000000000000000000000000841515021790557fe149139e745b87d23672d6d1bd3f9160008dc717a946188ef8c5155e4ee6b8453383604051600160a060020a039092168252151560208201526040908101905180910390a15060015b5b919050565b600054600160a060020a031681565b6000805433600160a060020a039081169116146101e357600080fd5b600160a060020a03821615156101f857600080fd5b6000547f95a4124b32fadd40e6e63088992a62e3505e61d1683b783d03e575d7c1dfb967903390600160a060020a031684604051600160a060020a03938416815291831660208301529091166040808301919091526060909101905180910390a1506000805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a03831617905560015b5b919050565b60005474010000000000000000000000000000000000000000900460ff16815600a165627a7a7230582086ed5c4c24d18affabae5a16b7b37e0ad6313975894b69666846817dfc1b7d670029",
+  "networks": {},
+  "schema_version": "0.0.5",
+  "updated_at": 1505225347234
+}

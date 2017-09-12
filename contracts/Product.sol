@@ -2,7 +2,7 @@ pragma solidity ^0.4.6;
 
 import './Stoppable.sol';
 
-contract Product is Stoppable{
+contract Product is Stoppable {
     
     address public titleHolder;
     string public name;

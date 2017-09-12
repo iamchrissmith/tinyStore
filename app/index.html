@@ -25,10 +25,18 @@
 </head>
 <body ng-cloak ng-controller="tinyShop">
 
-    <div>You have <span id="balance">Loading...</span> Ether</div>
-    <div>
+    <div>There are <span id="balance">Loading...</span> Products</div>
+    <div id="newProduct">
+        <form>
+            <input type="text" id="titleHolder" name="titleHolder" />
+            <input type="number" id="price" name="price" />
+            <input type="number" id="quantity" name="quantity" />
+            <input type="submit" value="Create Product" />
+        </form>
     </div>
-    <div id="status"></div>
+    <div id="products">
+
+    </div>
 
     <script>
         window.addEventListener('load', function() {

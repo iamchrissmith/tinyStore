@@ -1,0 +1,229 @@
+{
+  "contract_name": "Adminable",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "removable",
+          "type": "address"
+        }
+      ],
+      "name": "removeAdmin",
+      "outputs": [
+        {
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "userStructs",
+      "outputs": [
+        {
+          "name": "adminIndex",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "adminAddress",
+          "type": "address"
+        }
+      ],
+      "name": "isAdmin",
+      "outputs": [
+        {
+          "name": "isIndeed",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newAddress",
+          "type": "address"
+        }
+      ],
+      "name": "addAdmin",
+      "outputs": [
+        {
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getAdminCount",
+      "outputs": [
+        {
+          "name": "count",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "changeOwner",
+      "outputs": [
+        {
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "adminsIndex",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getAdminAtIndex",
+      "outputs": [
+        {
+          "name": "adminAddress",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "adminAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "adminIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogNewAdmin",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "adminAddress",
+          "type": "address"
+        }
+      ],
+      "name": "LogRemovedAdmin",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "adminAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "adminIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogUpdatedAdmin",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "oldOwner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "LogNewOwner",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x60606040525b60008054600160a060020a03191633600160a060020a03161790555b5b61070c806100316000396000f300606060405236156100965763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416631785f53c811461009b57806319447eb6146100ce57806324d7806c146100ff57806370480275146101325780638b7bf3eb146101655780638da5cb5b1461018a578063a6f9dae1146101b9578063ceab1b8b146101ec578063f1c4132e1461021e575b600080fd5b34156100a657600080fd5b6100ba600160a060020a0360043516610250565b604051901515815260200160405180910390f35b34156100d957600080fd5b6100ed600160a060020a03600435166103d4565b60405190815260200160405180910390f35b341561010a57600080fd5b6100ba600160a060020a03600435166103e6565b604051901515815260200160405180910390f35b341561013d57600080fd5b6100ba600160a060020a0360043516610454565b604051901515815260200160405180910390f35b341561017057600080fd5b6100ed610526565b60405190815260200160405180910390f35b341561019557600080fd5b61019d61052d565b604051600160a060020a03909116815260200160405180910390f35b34156101c457600080fd5b6100ba600160a060020a036004351661053c565b604051901515815260200160405180910390f35b34156101f757600080fd5b61019d600435610600565b604051600160a060020a03909116815260200160405180910390f35b341561022957600080fd5b61019d600435610632565b604051600160a060020a03909116815260200160405180910390f35b600080548190819033600160a060020a0390811691161461027057600080fd5b600054600160a060020a038581169116141561028b57600080fd5b610294846103e6565b151561029f57600080fd5b600160a060020a038416600090815260026020526040902054600180549193509060001981019081106102ce57fe5b906000526020600020900160005b9054906101000a9004600160a060020a031690508060018381548110151561030057fe5b906000526020600020900160005b8154600160a060020a039384166101009290920a918202918402191617905581166000908152600260205260409020829055600180549061035390600019830161066b565b5080600160a060020a03167f5ede8415d660a3597de1bac92cd3ebb06508a5821c9d188c325114e4548a4e768360405190815260200160405180910390a283600160a060020a03167fe6e9128d95298888c459545040e07936d4c97dd2fea5e367bd1bfb7d90b6cf8260405160405180910390a2600192505b5b5050919050565b60026020526000908152604090205481565b60015460009015156103fa5750600061044f565b600160a060020a03821660008181526002602052604090205460018054909190811061042257fe5b906000526020600020900160005b9054906101000a9004600160a060020a0316600160a060020a03161490505b919050565b60008054819033600160a060020a0390811691161461047257600080fd5b61047b836103e6565b1561048557600080fd5b600180548190808201610498838261066b565b916000526020600020900160005b8154600160a060020a038089166101009390930a8381029102199091161790915560008181526002602052604090819020939092039092556001546000190192507f01e55d63117e62bc8bcde3f9e260f27abb6558615338654e54d48de05c8cafd19083905190815260200160405180910390a2600191505b5b50919050565b6001545b90565b600054600160a060020a031681565b6000805433600160a060020a0390811691161461055857600080fd5b600160a060020a038216151561056d57600080fd5b6000547f95a4124b32fadd40e6e63088992a62e3505e61d1683b783d03e575d7c1dfb967903390600160a060020a031684604051600160a060020a03938416815291831660208301529091166040808301919091526060909101905180910390a1506000805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a03831617905560015b5b919050565b600180548290811061060e57fe5b906000526020600020900160005b915054906101000a9004600160a060020a031681565b600060018281548110151561064357fe5b906000526020600020900160005b9054906101000a9004600160a060020a031690505b919050565b81548183558181151161068f5760008381526020902061068f9181019083016106bf565b5b505050565b81548183558181151161068f5760008381526020902061068f9181019083016106bf565b5b505050565b61052a91905b808211156106d957600081556001016106c5565b5090565b905600a165627a7a72305820ed429afe93fad8f783c901a4b6d360649ba8bccf25b77b51487afdec18d401a60029",
+  "networks": {},
+  "schema_version": "0.0.5",
+  "updated_at": 1505225347234
+}
