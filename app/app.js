@@ -39,10 +39,16 @@ app.controller('tinyShop',
       .then( _instance => {
         $scope.contract = _instance;
         newProductWatcher = watchForProducts();
+        return $scope.contract.owner.call({from:$scope.account});
+      })
+      .then( _owner => {
+        $scope.contract.owner = _owner;
       });
 
     $scope.products = [];
     $scope.productIndex = {};
+    $scope.productOwners = {};
+    $scope.productOwnedIndex = {};
     $scope.newProduct = {};
 
     const updateBalance = () => {
@@ -61,12 +67,6 @@ app.controller('tinyShop',
             console.error("Error watching: ", err);
           } else {
             console.log("New product log: ", newProduct);
-            // newProduct.args.productPrice = newProduct.args.productPrice.toString(10);
-            // newProduct.args.productPriceInEth = web3.fromWei(newProduct.args.productPrice, "ether");
-            // newProduct.args.currentStock = newProduct.args.currentStock.toString(10);
-            // $scope.productIndex[newProduct.args.product] = $scope.products.length;
-            // $scope.products.push(newProduct.args);
-            // $scope.$apply();
             upsertProduct(newProduct.args.product);
           }
         });
@@ -109,7 +109,6 @@ app.controller('tinyShop',
 
     const watchProduct = (address) => {
       const product = Product.at(address);
-      console.log("watcher address, product", address, product);
       return product.LogUpdatedProduct( {}, {fromBlock:0})
       .watch( (err, updated) => {
         if (err)
@@ -128,6 +127,7 @@ app.controller('tinyShop',
       let productTitleHolder;
       let productPrice;
       let productStock;
+      let myBalance;
 
       return product.name.call({from:$scope.account})
       .then( _name => {
@@ -140,6 +140,10 @@ app.controller('tinyShop',
       })
       .then( _price => {
         productPrice = _price;
+        return product.balances.call($scope.account, {from:$scope.account});
+      })
+      .then( _myBalance => {
+        myBalance = _myBalance;
         return product.stock.call({from:$scope.account});
       })
       .then( _stock => {
@@ -152,19 +156,62 @@ app.controller('tinyShop',
         p.titleHolder = productTitleHolder;
         p.currentStock = parseInt(productStock.toString(10));
         p.product = address;
+        p.myBalance = parseInt(myBalance.toString(10));
 
         if(typeof($scope.productIndex[p.product]) == 'undefined') 
           {
             $scope.productIndex[p.product] = $scope.products.length;
+            let ownedIndex = 0;
+            if (typeof($scope.productOwners[p.titleHolder]) == 'undefined') {
+              $scope.productOwners[p.titleHolder] = [];
+            } else {
+              ownedIndex = $scope.productOwners[p.titleHolder].length;
+            }
+            $scope.productOwnedIndex[p.product] = ownedIndex;
             $scope.products.push(p);
+            $scope.productOwners[p.titleHolder].push(p);
             const productWatcher = watchProduct(address);
-            console.log("Product watcher: ", productWatcher);
             $scope.$apply();
           } else {
             const index = $scope.productIndex[p.product];
+            const ownedIndex = $scope.productOwnedIndex[p.product];
             $scope.products[index] = p;
+            $scope.productOwners[p.titleHolder][ownedIndex] = p;
             $scope.$apply();
           }
+      });
+    };
+
+    $scope.changeAccounts = (address) => {
+      console.log("new address: ", address);
+      $scope.account = address;
+      updateCurrentAccount();
+    }
+
+    const updateProductBalances = () => {
+      if ($scope.products.length > 0){
+        $scope.products.forEach( p => {
+          const product = Product.at(p.product);
+          product.balances.call($scope.account, {from:$scope.account})
+          .then( _myBalance => {
+            const index = $scope.productIndex[p.product];
+            const ownedIndex = $scope.productOwnedIndex[p.product];
+            $scope.products[index].myBalance = _myBalance;
+            $scope.productOwners[p.titleHolder][ownedIndex].myBalance = _myBalance;
+            $scope.$apply();
+          });
+        });
+      }
+    };
+
+    const updateCurrentAccount = () => {
+      $scope.contract.isAdmin($scope.account, {from:$scope.account})
+      .then(_isAdmin => {
+        $scope.isAdmin = _isAdmin;
+        console.log("ACCOUNT:", $scope.account);
+        $scope.selectedAccount = $scope.account;
+        updateBalance();
+        updateProductBalances();
       });
     };
 
@@ -176,9 +223,11 @@ app.controller('tinyShop',
               throw new Error("No account with which to transact");
           }
           $scope.accounts = accounts;
-          $scope.account = $scope.accounts[0];
-          console.log("ACCOUNT:", $scope.account);
+          $scope.accounts.forEach( account => {
+            $scope.productOwners[account] = [];
+          })
           console.log("Other Accounts: ", $scope.accounts);
-          updateBalance();
+          $scope.account = $scope.accounts[0];
+          updateCurrentAccount();
       }); 
 }]);

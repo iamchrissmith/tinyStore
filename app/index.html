@@ -23,36 +23,85 @@
 
 
 </head>
-<body ng-cloak ng-controller="tinyShop">
-
-    <div>There are {{ products.length }} Products</div>
-    <p>Your account: {{ account }} | Your Balance: {{ balance }} ({{ balanceInEth }} Ether)</p>
-    <div>
-        <form id="newProductForm" ng-submit="createProduct()">
-            <label for="titleHolder">Product Owner</label>
-            <select id="titleHolder" name="titleHolder" required
-                    ng-model="newProduct.titlee">
-                <option value="">--SELECT--</option>
-                <option ng-repeat="account in accounts" value="{{account}}">{{account}}</option>
-            </select>
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" ng-model="newProduct.name" required />
-            <label for="price">Price</label>
-            <input type="number" id="price" name="price" ng-model="newProduct.price" required />
-            <label for="quantity">Quantity</label>
-            <input type="number" id="quantity" name="quantity" ng-model="newProduct.quantity" required />
-            <input type="submit" value="Create Product" />
-        </form>
+<body ng-cloak ng-controller="tinyShop" class="container">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Your account: 
+                <select id="currentAccount" name="currentAccount" class="form-control"
+                    ng-model="selectedAccount"
+                    ng-change="changeAccounts(selectedAccount)">
+                    <option ng-repeat="_account in accounts" ng-selected="_account == account" value="{{_account}}">{{_account}}</option>
+                </select>
+            </h4>
+            <p class="card-text">Your Balance: {{ balance }} ({{ balanceInEth }} Ether)</p>
+        </div>
     </div>
-    <div id="products">
-        <div class="product" ng-repeat="product in products">
-            <h2>{{ product.productName }}</h2> <!-- may need to be product.args -->
+    <div id="products" class="row">
+        <div class="col-md-12">
+            <h3>Buy Products</h3>
+            <p>There are {{ products.length }} Product/s</p>
+        </div>
+        <div class="product col-md-4" ng-repeat="product in products">
+            <h2>{{ product.productName }}</h2>
             <p>{{ product.productPrice }} Wei / {{ product.productPriceInEth }} Ether</p>
             <p>Stock: {{ product.currentStock }}</p>
-            <button ng-hide="product.currentStock <= 0" ng-click="buyProduct(product.product)">Buy One</button>
-            <p><em>from: {{ product.titleHolder }}</em></p>
-            <p>Address: {{ product.product }}</p>
+            <button class="btn btn-primary" 
+                    ng-hide="product.currentStock <= 0 || product.titleHolder == account" 
+                    ng-click="buyProduct(product.product)">
+                    Buy One</button>
+            <button class="btn btn-secondary"
+                    ng-show="product.myBalance > 0">
+                    Withdraw Funds</button>
+            <p>My Balance: {{product.myBalance}}</p>
+            <!-- funds available to withdraw -->
         </div>
+    </div>
+    <div class="row" ng-show="productOwners[account].length > 0">
+        <div class="col-md-12">
+            <h3>Your Products</h3>
+        </div>
+        <div class="product col-md-4" ng-repeat="product in productOwners[account]">
+            <!-- edit form for product info -->
+            <!-- transfer ownership of product -->
+            <!-- withdraw funds from product -->
+            <h2>{{ product.productName }}</h2>
+            <p>{{ product.productPrice }} Wei</p>
+            <p>Stock: {{ product.currentStock }}</p>
+            <p><em>from: {{ product.titleHolder }}</em></p>
+        </div>
+    </div>
+
+    <div ng-show="isAdmin">
+      <h2>Add New Products</h2>
+        <form id="newProductForm" class="form-group" ng-submit="createProduct()">
+            <div class="form-group">
+                <label for="titleHolder">Product Owner</label>
+                <select id="titleHolder" name="titleHolder" class="form-control" required
+                    ng-model="newProduct.titlee">
+                    <option value="">--SELECT--</option>
+                    <option ng-repeat="account in accounts" value="{{account}}">{{account}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="name">Product Name</label>
+                <input type="text" id="name" name="name" class="form-control" ng-model="newProduct.name" required />
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="price">Price</label>
+                    <input type="number" id="price" name="price" class="form-control" ng-model="newProduct.price" required />
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" name="quantity" class="form-control" ng-model="newProduct.quantity" required />
+                </div>
+            </div>
+            <input type="submit" class="btn btn-secondary" value="Create Product" />
+        </form>
+    </div>
+
+    <div ng-show="contract.owner == account">
+      <p>Add new admins</p>
     </div>
 
     <script>
