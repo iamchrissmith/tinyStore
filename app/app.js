@@ -3,6 +3,8 @@ const Web3 = require("web3");
 const Promise = require("bluebird");
 const truffleContract = require("truffle-contract");
 const $ = require("jquery");
+const tinyShopJson = require("../build/contracts/TinyShop.json");
+const productJson = require('../build/contracts/Product.json');
 
 // Supports Mist, and other wallets that provide 'web3'.
 // if (typeof web3 !== 'undefined') {
@@ -10,19 +12,17 @@ const $ = require("jquery");
     // window.web3 = new Web3(web3.currentProvider);
 // } else {
     // Your preferred fallback.
-    web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545')); 
+    window.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545')); 
 // }
 
-const tinyShopJson = require("../build/contracts/tinyShop.json");
 const TinyShop = truffleContract(tinyShopJson);
 TinyShop.setProvider(web3.currentProvider);
 
-// const productJson = require('../build/contracts/Product.json');
-// const Product = truffleContract(productJson);
-// Product.setProvider(web3.currentProvider);
+const Product = truffleContract(productJson);
+Product.setProvider(web3.currentProvider);
 
-// Promise.promisifyAll(web3.eth, { suffix: "Promise" });
-// Promise.promisifyAll(web3.version, { suffix: "Promise" });
+Promise.promisifyAll(web3.eth, { suffix: "Promise" });
+Promise.promisifyAll(web3.version, { suffix: "Promise" });
 
 app.config( function($locationProvider) {
     $locationProvider.html5Mode({
@@ -38,12 +38,13 @@ app.controller('tinyShop',
     TinyShop.deployed()
       .then( _instance => {
         $scope.contract = _instance;
+        console.log($scope.contract);
         newProductWatcher = watchForProducts();
       });
 
     $scope.products = [];
     $scope.productIndex = {};
-    $scope.newProduct = {};
+    // $scope.newProduct = {};
     
     const watchForProducts = () => {
       $scope.productWatcher = $scope.contract.LogNewProduct( {}, {fromBlock: 0})
@@ -88,7 +89,7 @@ app.controller('tinyShop',
                         newProduct.name,
                         newProduct.price, 
                         newProduct.quantity, 
-                        {from:$scope.account, gas: 400000})
+                        {from:$scope.account, gas: 4000000})
         .then( tx => {
           console.log("receipt:", tx);
         });
@@ -156,7 +157,7 @@ app.controller('tinyShop',
     };
 
     // Work with the first account    
-    web3.eth.getAccounts()
+    web3.eth.getAccountsPromise()
       .then(accounts => {
           if (accounts.length == 0) {
               $("#balance").html("N/A");
@@ -166,11 +167,11 @@ app.controller('tinyShop',
           $scope.account = $scope.accounts[0];
           console.log("ACCOUNT:", $scope.account);
           console.log("Other Accounts: ", $scope.accounts);
-          return web3.eth.getBalance($scope.account);
+          return web3.eth.getBalancePromise($scope.account);
       })
       .then ( _balance => {
           $scope.balance = _balance.toString(10);
-          $scope.balanceInEth = web3.utils.fromWei($scope.balance, "ether");
+          $scope.balanceInEth = web3.fromWei($scope.balance, "ether");
           $scope.$apply();
       });
 }]);

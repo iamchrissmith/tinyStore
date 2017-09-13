@@ -1037,8 +1037,137 @@
       "links": {},
       "address": "0x67a4eaaa217338b5dd3ad1836d0f577554f544b3",
       "updated_at": 1505272036617
+    },
+    "1505307305525": {
+      "events": {
+        "0x9b0c4487cb64fbcfb002a02f211a68aff13334bc77ffcff6ce2076f104e9a181": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "titleHolder",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "product",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "productName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "productPrice",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "currentStock",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogNewProduct",
+          "type": "event"
+        },
+        "0xe149139e745b87d23672d6d1bd3f9160008dc717a946188ef8c5155e4ee6b845": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "switchSetting",
+              "type": "bool"
+            }
+          ],
+          "name": "LogRunSwitch",
+          "type": "event"
+        },
+        "0x01e55d63117e62bc8bcde3f9e260f27abb6558615338654e54d48de05c8cafd1": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "adminAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "adminIndex",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogNewAdmin",
+          "type": "event"
+        },
+        "0xe6e9128d95298888c459545040e07936d4c97dd2fea5e367bd1bfb7d90b6cf82": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "adminAddress",
+              "type": "address"
+            }
+          ],
+          "name": "LogRemovedAdmin",
+          "type": "event"
+        },
+        "0x5ede8415d660a3597de1bac92cd3ebb06508a5821c9d188c325114e4548a4e76": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "adminAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "adminIndex",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogUpdatedAdmin",
+          "type": "event"
+        },
+        "0x95a4124b32fadd40e6e63088992a62e3505e61d1683b783d03e575d7c1dfb967": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "oldOwner",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "LogNewOwner",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x120f36633fc7a9f276ab009fd5bbccb09c8dbad0",
+      "updated_at": 1505307326730
     }
   },
   "schema_version": "0.0.5",
-  "updated_at": 1505272036617
+  "updated_at": 1505307326730
 }
