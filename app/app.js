@@ -38,13 +38,21 @@ app.controller('tinyShop',
     TinyShop.deployed()
       .then( _instance => {
         $scope.contract = _instance;
-        console.log($scope.contract);
         newProductWatcher = watchForProducts();
       });
 
     $scope.products = [];
     $scope.productIndex = {};
-    // $scope.newProduct = {};
+    $scope.newProduct = {};
+
+    const updateBalance = () => {
+      web3.eth.getBalancePromise($scope.account)
+        .then ( _balance => {
+          $scope.balance = _balance.toString(10);
+          $scope.balanceInEth = web3.fromWei($scope.balance, "ether");
+          $scope.$apply();
+        });
+    };
     
     const watchForProducts = () => {
       $scope.productWatcher = $scope.contract.LogNewProduct( {}, {fromBlock: 0})
@@ -52,25 +60,27 @@ app.controller('tinyShop',
           if (err) {
             console.error("Error watching: ", err);
           } else {
-            console.log("New product: ", newProduct);
-            newProduct.args.productPrice = newProduct.args.productPrice.toString(10);
-            newProduct.args.productPriceInEth = web3.fromWei(newProduct.args.productPrice, "ether");
-            newProduct.args.currentStock = newProduct.args.currentStock.toString(10);
-            $scope.productIndex[newProduct.args.product] = $scope.products.length;
-            $scope.products.push(newProduct.args);
-            $scope.$apply();
-            // upsertProduct(newProduct.args.product);
+            console.log("New product log: ", newProduct);
+            // newProduct.args.productPrice = newProduct.args.productPrice.toString(10);
+            // newProduct.args.productPriceInEth = web3.fromWei(newProduct.args.productPrice, "ether");
+            // newProduct.args.currentStock = newProduct.args.currentStock.toString(10);
+            // $scope.productIndex[newProduct.args.product] = $scope.products.length;
+            // $scope.products.push(newProduct.args);
+            // $scope.$apply();
+            upsertProduct(newProduct.args.product);
           }
         });
     };
 
-    $scope.buyProduct = (address, price) => {
-      if($scope.balance < $scope.products[$scope.productIndex[address]]) return;
+    $scope.buyProduct = (address) => {
+      const price = $scope.products[$scope.productIndex[address]].productPrice;
+      if($scope.balance < $scope.products[$scope.productIndex[address]].productPrice) return;
       const product = Product.at(address);
-      console.log(product);
       product.buyProduct({from:$scope.account, value: price})
       .then( tx => {
         console.log(tx);
+        upsertProduct(address);
+        updateBalance();
       });
     };
 
@@ -99,7 +109,8 @@ app.controller('tinyShop',
 
     const watchProduct = (address) => {
       const product = Product.at(address);
-      const watcher = product.LogUpdatedProduct( {}, {fromBlock:0})
+      console.log("watcher address, product", address, product);
+      return product.LogUpdatedProduct( {}, {fromBlock:0})
       .watch( (err, updated) => {
         if (err)
           {
@@ -147,6 +158,7 @@ app.controller('tinyShop',
             $scope.productIndex[p.product] = $scope.products.length;
             $scope.products.push(p);
             const productWatcher = watchProduct(address);
+            console.log("Product watcher: ", productWatcher);
             $scope.$apply();
           } else {
             const index = $scope.productIndex[p.product];
@@ -167,11 +179,6 @@ app.controller('tinyShop',
           $scope.account = $scope.accounts[0];
           console.log("ACCOUNT:", $scope.account);
           console.log("Other Accounts: ", $scope.accounts);
-          return web3.eth.getBalancePromise($scope.account);
-      })
-      .then ( _balance => {
-          $scope.balance = _balance.toString(10);
-          $scope.balanceInEth = web3.fromWei($scope.balance, "ether");
-          $scope.$apply();
-      });
+          updateBalance();
+      }); 
 }]);

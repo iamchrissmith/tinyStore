@@ -49,7 +49,7 @@
             <h2>{{ product.productName }}</h2> <!-- may need to be product.args -->
             <p>{{ product.productPrice }} Wei / {{ product.productPriceInEth }} Ether</p>
             <p>Stock: {{ product.currentStock }}</p>
-            <button ng-hide="product.currentStock <= 0" ng-click="buyProduct(product.product, product.productPrice)">Buy One</button>
+            <button ng-hide="product.currentStock <= 0" ng-click="buyProduct(product.product)">Buy One</button>
             <p><em>from: {{ product.titleHolder }}</em></p>
             <p>Address: {{ product.product }}</p>
         </div>
