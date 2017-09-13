@@ -17,7 +17,7 @@ contract Product is Stoppable {
     
     event LogSale(address buyer, address seller, uint amount, uint remainingStock, uint titleHolderNewBalance);
     event LogWithdrawal(address recipient, uint amount);
-    event LogUpdatedProduct(address sender, string productName, uint productPrice, uint currentStock);
+    event LogUpdatedProduct(address sender, string productName, uint productPrice, uint currentStock, address titleHolder, bool running);
     event LogNewTitleHolder(address sender, address prevHolder, address newHolder);
     event LogStartSelling(address sender, string productName);
     event LogStopSelling(address sender, string productName);
@@ -43,6 +43,7 @@ contract Product is Stoppable {
         balances[titleHolder] += msg.value;
         
         LogSale(msg.sender, titleHolder, msg.value, stock, balances[titleHolder]);
+        LogUpdatedProduct(msg.sender, name, price, stock, titleHolder, running);
 
         return true;
     }
@@ -59,7 +60,7 @@ contract Product is Stoppable {
         price = newPrice;
         stock = newStock;
         
-        LogUpdatedProduct(msg.sender, name, price, stock);
+        LogUpdatedProduct(msg.sender, name, price, stock, titleHolder, running);
         
         return true;
         
@@ -89,6 +90,7 @@ contract Product is Stoppable {
         require(newHolder != 0);
         
         LogNewTitleHolder(msg.sender, titleHolder, newHolder);
+        LogUpdatedProduct(msg.sender, name, price, stock, titleHolder, running);
         titleHolder = newHolder;
         return true;
     }
@@ -99,6 +101,7 @@ contract Product is Stoppable {
         returns(bool success)
     {
         LogStartSelling(msg.sender, name);
+        LogUpdatedProduct(msg.sender, name, price, stock, titleHolder, running);
         running = true;
         return true;
     }
@@ -109,6 +112,7 @@ contract Product is Stoppable {
         returns(bool success)
     {
         LogStopSelling(msg.sender, name);
+        LogUpdatedProduct(msg.sender, name, price, stock, titleHolder, running);
         running = false;
         return true;
     }

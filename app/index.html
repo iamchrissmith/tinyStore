@@ -25,17 +25,34 @@
 </head>
 <body ng-cloak ng-controller="tinyShop">
 
-    <div>There are <span id="balance">Loading...</span> Products</div>
-    <div id="newProduct">
-        <form>
-            <input type="text" id="titleHolder" name="titleHolder" />
-            <input type="number" id="price" name="price" />
-            <input type="number" id="quantity" name="quantity" />
+    <div>There are {{ products.length }} Products</div>
+    <p>Your account: {{ account }} | Your Balance: {{ balance }} ({{ balanceInEth }} Ether)</p>
+    <div>
+        <form id="newProductForm" ng-submit="createProduct()">
+            <label for="titleHolder">Product Owner</label>
+            <select id="titleHolder" name="titleHolder" required
+                    ng-model="newProduct.titlee">
+                <option value="">--SELECT--</option>
+                <option ng-repeat="account in accounts" value="{{account}}">{{account}}</option>
+            </select>
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" ng-model="newProduct.name" required />
+            <label for="price">Price</label>
+            <input type="number" id="price" name="price" ng-model="newProduct.price" required />
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" name="quantity" ng-model="newProduct.quantity" required />
             <input type="submit" value="Create Product" />
         </form>
     </div>
     <div id="products">
-
+        <div class="product" ng-repeat="product in products">
+            <h2>{{ product.productName }}</h2> <!-- may need to be product.args -->
+            <p>{{ product.productPrice }} Wei / {{ product.productPriceInEth }} Ether</p>
+            <p>Stock: {{ product.currentStock }}</p>
+            <button ng-hide="product.currentStock <= 0" ng-click="buyProduct(product.product, product.productPrice)">Buy One</button>
+            <p><em>from: {{ product.titleHolder }}</em></p>
+            <p>Address: {{ product.product }}</p>
+        </div>
     </div>
 
     <script>
