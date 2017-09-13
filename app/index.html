@@ -49,10 +49,10 @@
                     ng-hide="product.currentStock <= 0 || product.titleHolder == account" 
                     ng-click="buyProduct(product.product)">
                     Buy One</button>
-            <button class="btn btn-secondary"
-                    ng-show="product.myBalance > 0">
-                    Withdraw Funds</button>
-            <p>My Balance: {{product.myBalance}}</p>
+            <div ng-show="product.myBalance > 0">
+              <button class="btn btn-secondary">Withdraw Funds</button>
+              <p>My Balance: {{product.myBalance}}</p>
+            </div>
             <!-- funds available to withdraw -->
         </div>
     </div>
