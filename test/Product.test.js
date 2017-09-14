@@ -92,7 +92,7 @@ contract('Product', (accounts) => {
         })
         .then( tx => {
           transactionCost = tx.receipt.gasUsed * gasPrice;
-          return web3.eth.getBalance(owner)
+          return web3.eth.getBalance(owner);
         })
         .then( (newBalance) => {
           assert.equal(ownerBalance.plus(price).minus(transactionCost).toString(10), newBalance.toString(10), `Owner balance did not increase by ${price}`);

@@ -21,10 +21,11 @@ contract Adminable is Owned {
         returns(bool success)
     {
         require(!isAdmin(newAddress));
+
+        uint newIndex = adminsIndex.push(newAddress) - 1;
         
-        userStructs[newAddress].adminIndex = adminsIndex.push(newAddress) - 1;
+        userStructs[newAddress].adminIndex = newIndex;
         
-        uint newIndex = adminsIndex.length - 1;
         LogNewAdmin(newAddress, newIndex);
         
         return true;
@@ -37,6 +38,7 @@ contract Adminable is Owned {
     {
         require(removable != owner);
         require(isAdmin(removable));
+        require(adminsIndex.length > 1);
         
         uint rowToDelete = userStructs[removable].adminIndex;
         address keyToMove = adminsIndex[adminsIndex.length - 1];
@@ -56,7 +58,8 @@ contract Adminable is Owned {
         constant
         returns(bool isIndeed)
     {
-        if(adminsIndex.length == 0) return false;
+        if (adminsIndex.length == 0) 
+            return false;
         
         return (adminsIndex[userStructs[adminAddress].adminIndex] == adminAddress);
     }

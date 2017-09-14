@@ -1,5 +1,5 @@
-var tinyShop = artifacts.require("./tinyShop.sol");
+var TinyShop = artifacts.require("./TinyShop.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(tinyShop);
+  deployer.deploy(TinyShop);
 };

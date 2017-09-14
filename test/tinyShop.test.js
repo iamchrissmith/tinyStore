@@ -1,7 +1,7 @@
-const tinyShop = artifacts.require('./tinyShop.sol');
+const TinyShop = artifacts.require('./TinyShop.sol');
 const expectedExceptionPromise = require('./expected_exception_testRPC_and_geth');
 
-contract('tinyShop', (accounts) => {
+contract('TinyShop', (accounts) => {
   const owner = accounts[0];
   const admin = accounts[1];
   const user = accounts[2];
@@ -9,7 +9,7 @@ contract('tinyShop', (accounts) => {
   let contract;
 
   beforeEach( () => {
-    return tinyShop.new({from:owner})
+    return TinyShop.new({from:owner})
       .then( (instance) => {
         contract = instance;
       });
@@ -94,7 +94,13 @@ contract('tinyShop', (accounts) => {
     it('the owner should not be able to remove self as an administrator', () => {
       return expectedExceptionPromise( () => {
         return contract.removeAdmin(owner, {from: owner}, 3000000);
-      })
+      });
+    });
+
+    it('the owner should not be able to remove last admin', () => {
+      return expectedExceptionPromise( () => {
+        return contract.removeAdmin(owner, {from: owner}, 3000000);
+      });
     });
   });
 
